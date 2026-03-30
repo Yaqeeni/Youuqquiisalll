@@ -924,14 +924,22 @@ document.addEventListener('keydown',e=>{
 
 /* ══ JAR ══ */
 let jarMemories=[
-  {cat:'أول مرة',       text:'اليوم الذي التقينا فيه — ما زلت أتذكر بالضبط ما كنتِ ترتدين.'},
-  {cat:'لحظة محببة',    text:'غروب الشمس الذي شاهدناه معًا في صمت تام. كان كل شيء.'},
-  {cat:'أحبكِ لأنكِ…',  text:'دائمًا تعرفين كيف تجعليني أبتسم في اللحظة التي أحتاج فيها إلى ذلك.'},
-  {cat:'ذكرى مضحكة',    text:'حين ضعنا تمامًا وحوّلنا الأمر إلى أجمل مغامرة.'},
-  {cat:'حلم مشترك',     text:'يومًا ما سنستيقظ في مكان جديد ونسميه وطننا.'},
+  'فاكره الموز باللبن؟ 🙂‍↕️🍌',
+  'طب المياه ومش هشرب 🥺',
+  'البشمله عسل من ايدك عمومًا تسلملي ايدك 😋🫶🏼',
+  'التراك عامل ايه 🤨',
+  'انا شايف اننا مش مناسبين لبعض 🫷',
+  'احمد الخطير 🤨',
+  'البنطلون الاخضر 🥺',
+  'فاكره لما جيبتي هرهوره من بني مزار اول مره',
+  'تعرفي اني ملاكم؟ 🤨🤨🤨',
+  'هدغدغك في بيتنا 🤗😊',
+  'الكرباج السوداني 😊\nفاكره جدو لما كان بيخبيكي وتباتي معاه 😂💗💗💗💗💗💗🫶🏼',
+  'جدو شعبان حبيبك كان اثرى الاثرياء كان مسئول عن حساب مفتوح ليقين بتجيب كل حاجه براحتها 😂💗💗💗💗\n(محدش يعملها هذه الايام)',
+  'مبفطرش 🥺',
+  'اصل فصل معلش ءءءءء 🥺🥺🥺🥺',
 ];
 let jarDrawn=new Set();
-const CAT_COLORS={'أول مرة':'#c2e0f4','لحظة محببة':'#f4c8d8','ذكرى مضحكة':'#fef0c0','أحبكِ لأنكِ…':'#c8f0d0','حلم مشترك':'#dcc8f8','سرّ':'#f8d0c8'};
 
 function updateJarViz(){
   const total=jarMemories.length,pct=Math.min(total/18,1);
@@ -956,44 +964,51 @@ function pickMemory(){
   wrap.classList.remove('shaking');void wrap.offsetWidth;wrap.classList.add('shaking');
   playSound('shake');
   const available=jarMemories.map((_,i)=>i).filter(i=>!jarDrawn.has(i));
-  if(!available.length&&jarMemories.length>0){showDrawn(null,null,"You've opened every memory! 🎉 Reset to go again.");return;}
+  if(!available.length&&jarMemories.length>0){showDrawn(null,"You've opened every memory! 🎉 Reset to go again.");return;}
   if(!jarMemories.length)return;
   setTimeout(()=>{
     const pick=available[Math.floor(Math.random()*available.length)];
-    jarDrawn.add(pick);const m=jarMemories[pick];
-    showDrawn(m.cat,m.text,null);spawnSparks(window.innerWidth/2,window.innerHeight*.4,16);
+    jarDrawn.add(pick);
+    showDrawn(jarMemories[pick],null);
+    spawnSparks(window.innerWidth/2,window.innerHeight*.4,16);
     playSound('pop');updateJarViz();
   },320);
 }
 
-function showDrawn(cat,text,msg){
+function showDrawn(text,msg){
   const card=document.getElementById('drawnCard'),emp=document.getElementById('drawnEmpty');
-  const catEl=document.getElementById('drawnCat'),txtEl=document.getElementById('drawnText'),btns=document.getElementById('jarBtns');
+  const txtEl=document.getElementById('drawnText'),btns=document.getElementById('jarBtns');
   card.style.animation='none';void card.offsetWidth;card.style.animation='fadeIn .4s ease';
-  if(msg){emp.textContent=msg;emp.style.display='';catEl.style.display='none';txtEl.style.display='none';btns.style.display='flex';return;}
-  emp.style.display='none';catEl.style.display='';txtEl.style.display='';btns.style.display='flex';
-  catEl.textContent=cat;txtEl.textContent=text;
-  card.style.borderColor=(CAT_COLORS[cat]||'#a8d4f0')+'88';
+  if(msg){
+    emp.textContent=msg;emp.style.display='';
+    txtEl.style.display='none';btns.style.display='flex';
+    card.style.borderColor='rgba(244,184,203,0.33)';return;
+  }
+  emp.style.display='none';txtEl.style.display='';btns.style.display='flex';
+  txtEl.innerHTML=text.replace(/\n/g,'<br>');
+  // cycle border through soft palette
+  const palettes=['#c2e0f488','#f4c8d888','#fef0c088','#c8f0d088','#dcc8f888','#f8d0c888'];
+  card.style.borderColor=palettes[Math.floor(Math.random()*palettes.length)];
 }
 
 function resetJar(){
   jarDrawn.clear();updateJarViz();
   const emp=document.getElementById('drawnEmpty');
   emp.textContent='All memories are back in the jar — shake it! ✨';emp.style.display='';
-  document.getElementById('drawnCat').style.display='none';document.getElementById('drawnText').style.display='none';
+  document.getElementById('drawnText').style.display='none';
   document.getElementById('jarBtns').style.display='none';
   document.getElementById('drawnCard').style.borderColor='rgba(244,184,203,0.33)';
 }
 
 function addToJar(){
   const text=document.getElementById('jarInput').value.trim();
-  const cat=document.getElementById('jarCat').value;
   if(!text)return;
-  jarMemories.push({cat,text});document.getElementById('jarInput').value='';
+  jarMemories.push(text);
+  document.getElementById('jarInput').value='';
   updateJarViz();spawnSparks(window.innerWidth/2,window.innerHeight/2,12);playSound('pop');
 }
 updateJarViz();
-
+  
 /* ══ MUSIC ══ */
 let audioCtx=null,musicPlaying=false,bgInterval=null,melodyIdx=0;
 const MELODY=[261,293,329,349,392,440,493,523,493,440,392,349,329,293];
